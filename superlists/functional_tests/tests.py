@@ -38,9 +38,9 @@ class NewVisitorTest(LiveServerTestCase):
         # 她按回车键后，被带到一个新URL
         # 待办事项表格中显示了“1: Buy peacock feathers”
         inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
         edith_lists_url = self.browser.current_url
         self.assertRegex(edith_lists_url, '/lists/.+')
-        time.sleep(1)
         self.check_for_row_in_list_table("1: Buy peacock feathers")
 
         # 页面中还有一个文本框，可以输入其他的待办事项
