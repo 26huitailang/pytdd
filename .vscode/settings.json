@@ -1,0 +1,7 @@
+{
+    "python.pythonPath": "/Users/chensijian/.virtualenvs/superlists-S_SPJ3Zt/bin/python",
+    "python.linting.enabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.pep8Enabled": false,
+    "python.linting.pylintEnabled": false
+}
