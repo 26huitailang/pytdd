@@ -7,23 +7,24 @@ from django.utils.html import escape
 
 from lists.views import home_page
 from lists.models import Item, List
+from lists.forms import ItemForm
 
 
 class HomePageTest(TestCase):
+    maxDiff = None
+
     @staticmethod
     def remove_csrf(html_code):
         csrf_regex = r"<input[^>]+csrfmiddlewaretoken[^>]+>"
         return re.sub(csrf_regex, "", html_code)
 
-    def test_root_url_resolves_to_home_page_view(self):
-        found = resolve("/")
-        self.assertEqual(found.func, home_page)
+    def test_home_page_renders_home_template(self):
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'home.html')
 
-    def test_home_page_returns_correct_html(self):
-        request = HttpRequest()
-        response = home_page(request)
-        expected_html = render_to_string("home.html")
-        self.assertEqual(self.remove_csrf(response.content.decode()), expected_html)
+    def test_home_page_uses_item_form(self):
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm)
 
 
 class ListViewTest(TestCase):
@@ -59,7 +60,7 @@ class ListViewTest(TestCase):
 
         self.client.post(
             '/lists/{}/'.format(correct_list.id),
-            data={'item_text': 'A new item for an existing list'}
+            data={'text': 'A new item for an existing list'}
         )
 
         self.assertEqual(Item.objects.count(), 1)
@@ -73,7 +74,7 @@ class ListViewTest(TestCase):
 
         response = self.client.post(
             "/lists/%d/" % (correct_list.id,),
-            data={"item_text": "A new item for an existing list"},
+            data={"text": "A new item for an existing list"},
         )
 
         self.assertRedirects(response, "/lists/%d/" % (correct_list.id,))
@@ -82,7 +83,7 @@ class ListViewTest(TestCase):
         list_ = List.objects.create()
         response = self.client.post(
             '/lists/{}/'.format(list_.id),
-            data={'item_text': ''}
+            data={'text': ''}
         )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'list.html')
@@ -92,26 +93,26 @@ class ListViewTest(TestCase):
 
 class NewListTest(TestCase):
     def test_saving_a_POST_request(self):
-        self.client.post("/lists/new", data={"item_text": "A new list item"})
+        self.client.post("/lists/new", data={"text": "A new list item"})
 
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, "A new list item")
 
     def test_redirects_after_POST(self):
-        response = self.client.post("/lists/new", data={"item_text": "A new list item"})
+        response = self.client.post("/lists/new", data={"text": "A new list item"})
 
         new_list = List.objects.first()
         self.assertRedirects(response, "/lists/%d/" % (new_list.id,))
 
     def test_validation_errors_are_sent_back_to_home_page_template(self):
-        response = self.client.post('/lists/new', data={'item_text': ''})
+        response = self.client.post('/lists/new', data={'text': ''})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
         expected_error = escape("You can't have an empty list item")  # 单引号会被模板转义
         self.assertContains(response, expected_error)
 
     def test_invalid_list_items_arent_saved(self):
-        self.client.post('/lists/new', data={'item_text': ''})
+        self.client.post('/lists/new', data={'text': ''})
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
