@@ -48,6 +48,7 @@ class ItemValidationTest(FunctionalTest):
         # 她不小心输入了一个重复的待办事项
         self.get_item_input_box().send_keys('Buy wellies')
         self.get_item_input_box().send_keys(Keys.ENTER)
+        time.sleep(1)
 
         # 她看到一条有帮助的错误信息
         self.check_for_row_in_list_table('1: Buy wellies')
