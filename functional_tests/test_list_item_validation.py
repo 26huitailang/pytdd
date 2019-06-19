@@ -9,6 +9,7 @@ class ItemValidationTest(FunctionalTest):
         # 输入框中没输入内容，她就按下了回车键
         self.browser.get(self.server_url)
         self.get_item_input_box().send_keys(Keys.ENTER)
+        time.sleep(1)
 
         # 首页刷新了，显示一个错误信息
         # 提示待办事项不能为空
