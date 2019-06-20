@@ -1,8 +1,7 @@
 import sys
 from django.shortcuts import render, redirect, reverse
 from django.core.mail import send_mail
-from django.contrib.auth import authenticate
-from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib import auth
 from django.contrib import messages
 
 from accounts.models import Token
@@ -29,16 +28,12 @@ def send_login_email(request):
 
 
 def login(request):
-    print('login view', file=sys.stderr)
-    print("uid", request.GET.get('token'))
-    user = authenticate(uid=request.GET.get('token'))
-    print("user", user)
-    if user is not None:
-        print(user.email)
-        auth_login(request, user)
+    user = auth.authenticate(uid=request.GET.get('token'))
+    if user:
+        auth.login(request, user)
     return redirect('/')
 
 
 def logout(request):
-    auth_logout(request)
+    auth.logout(request)
     return redirect('/')
