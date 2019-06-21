@@ -25,7 +25,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         if "liveserver" in os.environ:
-            cls.server_host = os.getenv["liveserver"]
+            cls.server_host = os.environ["liveserver"]
             cls.server_url = "http://" + cls.server_host
             cls.against_staging = True
             return
