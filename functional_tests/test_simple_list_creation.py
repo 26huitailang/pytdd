@@ -29,7 +29,7 @@ class NewVisitorTest(FunctionalTest):
         time.sleep(1)
         edith_lists_url = self.browser.current_url
         self.assertRegex(edith_lists_url, "/lists/.+")
-        self.check_for_row_in_list_table("1: Buy peacock feathers")
+        self.wait_for_row_in_list_table("1: Buy peacock feathers")
 
         # 页面中还有一个文本框，可以输入其他的待办事项
         # 她输入了“Use peacock feathers to make a fly（使用孔雀羽毛做假蝇） ”
@@ -40,8 +40,8 @@ class NewVisitorTest(FunctionalTest):
         time.sleep(1)
 
         # 页面再次更新，清单中显示了这两个待办事项
-        self.check_for_row_in_list_table("1: Buy peacock feathers")
-        self.check_for_row_in_list_table("2: Use peacock feathers to make a fly")
+        self.wait_for_row_in_list_table("1: Buy peacock feathers")
+        self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly")
 
         # 现在一个叫作弗朗西斯的新用户访问了网站
 
