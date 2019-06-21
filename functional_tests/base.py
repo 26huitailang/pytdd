@@ -3,6 +3,7 @@ import time
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from .server_tools import reset_database
 
 MAX_WAIT = 10
 
@@ -24,17 +25,22 @@ class FunctionalTest(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         if "liveserver" in os.environ:
-            cls.server_url = "http://" + os.environ["liveserver"]
+            cls.server_host = os.getenv["liveserver"]
+            cls.server_url = "http://" + cls.server_host
+            cls.against_staging = True
             return
         super().setUpClass()
+        cls.against_staging = False
         cls.server_url = cls.live_server_url
 
     @classmethod
     def tearDownClass(cls):
-        if cls.server_url == cls.live_server_url:
+        if not cls.against_staging:
             super().tearDownClass()
 
     def setUp(self):
+        if self.against_staging:
+            reset_database(self.server_host)
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(5)
 
